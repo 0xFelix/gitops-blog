@@ -124,6 +124,8 @@ your hub cluster. We will use the OpenShift console where possible.
 6. Wait until the created `MultiClusterHub` is ready (`Operators` -->
    `Installed Operators` --> see status of ACM)
 
+# TODO picture of ACM install
+
 ### Adding managed clusters to ACM on the hub cluster
 
 Managed clusters can be added to ACM in two ways:
@@ -192,6 +194,10 @@ console where possible again.
 4. Click on `Install`, keep defaults and click on `Install` again
 6. Wait until OpenShift GitOps is ready (`Operators` -->
    `Installed Operators` --> see status of OpenShift GitOps)
+
+# TODO picture of GitOps install
+
+# TODO picture of both Operators ready
 
 ### Accessing the OpenShift GitOps web interface
 
@@ -277,6 +283,8 @@ without knowing its CRD.
 To see what is actually deployed have a look into the following directory:
 `applicationsets/virtualization/manifests`.
 
+# TODO picture of deployed CNV in ArgoCD
+
 ## Deploying a VirtualMachine to one or more managed clusters
 
 To deploy a Fedora `VirtualMachine` on all managed clusters with the help of
@@ -292,6 +300,8 @@ available on the cluster by default to boot a Fedora cloud image.
 
 To see what is actually deployed have a look into the following directory:
 `applicationsets/demo-vm/manifests`.
+
+# TODO picture of stopped VM in ArgoCD
 
 ### How to start or stop a VirtualMachine
 
@@ -312,6 +322,8 @@ to your repository. In the ArgoCD UI select the `Application` of the
 `VirtualMachine` and click `Refresh` to apply the change immediately.
 Otherwise, it will take some time until ArgoCD scans the repository and
 picks up the change.
+
+# TODO picture of running VM in ArgoCD
 
 ## Advanced usage of ACM Placements with OpenShift GitOps
 
