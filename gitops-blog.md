@@ -23,7 +23,7 @@ Cluster Management and OpenShift GitOps.
 
 Red Hat Advanced Cluster Management or short ACM simplifies the management
 of multiple clusters by offering end-to-end management, visibility and
-control of the whole cluster and application life cycle. It can act as a
+control of the whole cluster and application life cycle. It acts as a
 central point for keeping an inventory of all your clusters and
 applications and enables multi-cluster and multi-cloud scenarios, such as
 deploying the same application across clusters in different regions,
@@ -59,12 +59,10 @@ the [GitOps documentation](https://docs.openshift.com/container-platform/4.12/ci
 
 ### A quick primer about Applications and ApplicationSets
 
-Explain what are Applications and ApplicationSets.
-
 The ArgoCD `Application` is
 a [`CustomResourceDefinition` (CRD)](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/),
 which essentially describes a source of manifests and a target cluster to apply
-the manifests to. Besides that options like automatic creation of namespaces
+the manifests to. Besides that, options like automatic creation of namespaces
 or the automatic revert of changes can be configured.
 
 The ArgoCD `ApplicationSet` is a CRD building on ArgoCD `Applications`,
@@ -72,7 +70,7 @@ targeted to deploy and manage `Applications` across multiple clusters while
 using the same manifest or declaration. It is possible to deploy multiple
 `ApplicationSets` which are contained in one monorepo. By using generators
 it is possible to dynamically select a subset of clusters available to
-ArgoCD to deploy resources on to.
+ArgoCD to deploy resources to.
 
 In this blog post we are going to use `ApplicationSets` to deploy OpenShift
 Virtualization and `VirtualMachines` to multiple clusters while using
@@ -96,15 +94,16 @@ in this blog post yourself:
 
 ## Repository preparation
 
-A demo repository can be found at https://github.com/0xFelix/gitops-demo.
-Please clone this repository to somewhere where you are able to make
-modifications to it (i.e. forking it on GitHub). Then open a terminal on
+A repository with the files used in this blog post can be found at
+https://github.com/0xFelix/gitops-demo.
+Please clone this repository somewhere where you are able to make
+changes to it (i.e. forking it on GitHub). Then open a terminal on
 your machine, check out the repository locally and change your working directory
-into the checked out repository.
+into the cloned repository.
 
-The `ApplicationSets` in the demo repository use the URL of the demo repository
-as `repoURL`. To be able to make changes to the `ApplicationSets` you
-need to adjust the  `repoURL` to the URL of your own repository. If you do
+The `ApplicationSets` in the demo repository use the above repository URL as
+`repoURL`. To be able to make changes to your `ApplicationSets`, you
+need to adjust the `repoURL` to the URL of your own repository. If you do
 this later don't forget to update any existing `ApplicationSets` on your hub
 cluster.
 
@@ -133,7 +132,7 @@ Managed clusters can be added to ACM in two ways:
 2. Add an existing cluster to ACM
 
 > Note: For the sake of simplicity we will let ACM create the managed
-> clusters in this demo on a public cloud provider. Please note that nested
+> clusters in this blog post on a public cloud provider. Please note that nested
 > virtualization is not supported in production deployments.
 
 To create one or more managed clusters follow these steps:
@@ -149,13 +148,13 @@ To create one or more managed clusters follow these steps:
 
 > Note: When using Azure as cloud provider select instance type
 `Standard_D8s_v3` for the control plane and `Standard_D4s_v3` for the worker
-> nodes, because with the default selections resources become to tight to
-> run virtual machines on the cluster.
+> nodes, resources might become to tight to run virtual machines on the
+> cluster otherwise.
 
 ### Organizing managed clusters in a set
 
-Managed clusters can be grouped in `ManagedClusterSets`. These set can be
-bound to namespaces with a `ManagedClusterSetBinding`, to make the clusters
+Managed clusters can be grouped into `ManagedClusterSets`. These sets can be
+bound to namespaces with a `ManagedClusterSetBinding` to make managed clusters
 available in the bound namespaces.
 
 To add managed clusters to a new set follow these steps:
@@ -172,10 +171,16 @@ To add managed clusters to a new set follow these steps:
 Now we have a `ManagedClusterSet`, that can be used to make the managed clusters
 available to ArgoCD.
 
+# TODO picture of managed clusters in ACM
+
+In this screenshot you can see, that we successfully added our managed
+clusters to the inventory of ACM and our `ManagedClusterSet`.
+
 ## Installing and configuring OpenShift GitOps
 
-The following steps will guide you through installing and configuring ACM on
-your hub cluster. We will use the OpenShift console where possible again.
+The following steps will guide you through installing and configuring
+OpenShift GitOps or ArgoCD on your hub cluster. We will use the OpenShift
+console where possible again.
 
 ### Installing OpenShift GitOps on the hub cluster
 
@@ -211,39 +216,41 @@ oc get route -n openshift-gitops openshift-gitops-server -o jsonpath='{.spec.hos
 
 ### Making a set of managed clusters available to OpenShift GitOps
 
-To make a set of managed clusters available to OpenShift GitOps a tight
-integration between ACM and GitOps is available. The integration is
+To make a set of managed clusters available to OpenShift GitOps, a tight
+integration between ACM and GitOps exists. The integration is
 controlled with the `GitOpsCluster` CRD.
 
 Follow these steps to make the managed clusters available to GitOps:
 
 1. Copy the login command for the command line by clicking on your username on
    the top right and then click on `Copy login command`
-2. Run the copied command in your command line
+2. Run the copied command in your terminal
 3. Create a `ManagedClusterSetBinding` in the `openshift-gitops` namespace
    to make the `ManagedClusterSet` available in this namespace
-
-- See file
-  [managedclustersetbinding.yaml](./acm-gitops-integration/managedclustersetbinding.yaml)
-- Run `oc create -f acm-gitops-integration/managedclustersetbinding.yaml`
-
+    - See file
+      [managedclustersetbinding.yaml](https://github.com/0xFelix/gitops-demo/blob/main/acm-gitops-integration/managedclustersetbinding.yaml)
+    - Run `oc create -f acm-gitops-integration/managedclustersetbinding.yaml`
 4. Create a `Placement` to let ACM decide which clusters should be made
    available to GitOps
-
-- See file [placement.yaml](./acm-gitops-integration/placement.yaml)
-- Run `oc create -f acm-gitops-integration/placement.yaml`
-- For the sake of simplicity this will select the whole
-  `ManagedClusterSet`, but advanced use cases are possible
-
+    - See
+      file [placement.yaml](https://github.com/0xFelix/gitops-demo/blob/main/acm-gitops-integration/placement.yaml)
+    - Run `oc create -f acm-gitops-integration/placement.yaml`
+    - For the sake of simplicity this will select the whole
+      `ManagedClusterSet`, but advanced use cases are possible
 5. Create a `GitOpsCluster` to finally make the selected clusters available to
    GitOps on the hub cluster
+    - See
+      file [gitopscluster.yaml](https://github.com/0xFelix/gitops-demo/blob/main/acm-gitops-integration/gitopscluster.yaml)
+    - Run `oc create -f acm-gitops-integration/gitopscluster.yaml`
 
-- See file [gitopscluster.yaml](./acm-gitops-integration/gitopscluster.yaml)
-- Run `oc create -f acm-gitops-integration/gitopscluster.yaml`
+# TODO picture of managed clusters in ArgoCD
+
+In this screenshot you can see, that we successfully made our managed
+clusters available to ArgoCD.
 
 ## Deploying OpenShift Virtualization to one or more managed clusters
 
-To deploy OpenShift Virtualization to all managed clusters with the help of
+To deploy OpenShift Virtualization to the managed clusters with the help of
 an `ApplicationSet` run the following command:
 
 ```shell
@@ -252,7 +259,7 @@ oc create -f applicationsets/virtualization/applicationset-virtualization.yaml
 
 This will create an `Application` for each managed cluster that deploys
 OpenShift Virtualization with its default settings. The `Application` will
-ensure that the namespace `openshift-cnv` exists and it will automatically
+ensure that the namespace `openshift-cnv` exists, and it will automatically
 apply any changes to this repository or undo changes which are not in this
 repository. Sync waves are used to ensure that resources are created in the
 right order.
@@ -263,7 +270,7 @@ Order of resource creation:
 2. `Subscription`
 3. `HyperConverged`
 
-Because the `HyperConverged` CRD is unknown to ArgoCD the sync option
+Because the `HyperConverged` CRD is unknown to ArgoCD, the sync option
 `SkipDryRunOnMissingResource=true` is set to allow ArgoCD to create a CR
 without knowing its CRD.
 
@@ -281,7 +288,7 @@ oc create -f applicationsets/demo-vm/applicationset-demo-vm.yaml
 
 This will create an `Application` for each managed cluster that deploys
 a simple `VirtualMachine` on each cluster. It uses the Fedora `DataSource`
-available by default on the cluster to boot a Fedora cloud image.
+available on the cluster by default to boot a Fedora cloud image.
 
 To see what is actually deployed have a look into the following directory:
 `applicationsets/demo-vm/manifests`.
@@ -289,16 +296,16 @@ To see what is actually deployed have a look into the following directory:
 ### How to start or stop a VirtualMachine
 
 To start or stop a `VirtualMachine` you need to edit the `spec.running`
-field of a `VirtualMachine` and set it to a corresponding value (`false`
+field of a `VirtualMachine` and set it to the corresponding value (`false`
 or `true`).
 
 If the `VirtualMachine` has an appropriate termination grace
-period (`spec.template.spec.terminationGracePeriodSeconds`) setting this
+period (`spec.template.spec.terminationGracePeriodSeconds`), setting this
 value to `false` will gracefully shut down the `VirtualMachine`. When
-setting the timeout grace period to 0 seconds the `VirtualMachine` is
+setting the timeout grace period to 0 seconds, the `VirtualMachine` is
 stopped immediately however.
 
-To deploy new changes with ArgoCD you need to commit and push changes to
+To apply new changes with ArgoCD you need to commit and push changes to
 the Git repository containing your `Application`. To start or stop a
 `VirtualMachine` update the manifest and commit and push
 to your repository. In the ArgoCD UI select the `Application` of the
@@ -308,11 +315,11 @@ picks up the change.
 
 ## Advanced usage of ACM Placements with OpenShift GitOps
 
-For the sake of simplicity the `Placement` created in this demo selects the
+For the sake of simplicity the `Placement` created in this blog post selects the
 whole `ManagedClusterSet`, but more advanced use cases are possible.
 
 ACM can dynamically select a subset of clusters from the
-`ManagedClusterSet` while following a defined set of criteria. This for
+`ManagedClusterSet`, while following a defined set of criteria. This for
 example allows to schedule `VirtualMachines` on clusters with the most
 resources available at the time of the placement decision.
 
@@ -322,7 +329,7 @@ For more on this topic see
 ## Summary and outlook
 
 In this blog post we set up a hub cluster and one or more clusters managed
-by ACM to deploy applications onto from a centralized management point. As an
+by ACM to deploy applications to from a centralized management point. As an
 example application we deployed a simple virtual machine and learned how we
 can start and stop virtual machines in a declarative way. All of this was
 accomplished in the GitOps way by using a Git repository as a single source
