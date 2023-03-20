@@ -114,6 +114,8 @@ your hub cluster. We will use the OpenShift console where possible.
 
 ### Installing ACM on the hub cluster
 
+![](https://i.imgur.com/FB8niIZ.png)
+
 1. Login as cluster administrator on the UI of the hub cluster
 2. Open the `Administrator` view if it is not already selected
 2. In the menu click on `Operators` and open `OperatorHub`
@@ -123,8 +125,6 @@ your hub cluster. We will use the OpenShift console where possible.
 5. Wait until `MultiClusterHub` can be created and create it
 6. Wait until the created `MultiClusterHub` is ready (`Operators` -->
    `Installed Operators` --> see status of ACM)
-
-# TODO picture of ACM install
 
 ### Adding managed clusters to ACM on the hub cluster
 
@@ -173,10 +173,9 @@ To add managed clusters to a new set follow these steps:
 Now we have a `ManagedClusterSet`, that can be used to make the managed clusters
 available to ArgoCD.
 
-# TODO picture of managed clusters in ACM
+![](https://i.imgur.com/81VN8tQ.png)
 
-In this screenshot you can see, that we successfully added our managed
-clusters to the inventory of ACM and our `ManagedClusterSet`.
+If done correctly, the cluster list of the created `ManagedClusterSet` in ACM should look like in the screenshot above.
 
 ## Installing and configuring OpenShift GitOps
 
@@ -185,6 +184,8 @@ OpenShift GitOps or ArgoCD on your hub cluster. We will use the OpenShift
 console where possible again.
 
 ### Installing OpenShift GitOps on the hub cluster
+
+![](https://i.imgur.com/yMawpQG.png)
 
 1. Login as cluster administrator on the UI of the hub cluster
 2. Open the `Administrator` view if it is not already selected
@@ -195,13 +196,13 @@ console where possible again.
 6. Wait until OpenShift GitOps is ready (`Operators` -->
    `Installed Operators` --> see status of OpenShift GitOps)
 
-# TODO picture of GitOps install
+If installed correctly, the list of installed operators on your cluster shoud look like in the following screenshot:
 
-# TODO picture of both Operators ready
+![](https://i.imgur.com/gunWrRz.png)
 
-### Accessing the OpenShift GitOps web interface
+### Accessing the OpenShift GitOps web UI
 
-The OpenShift GitOps web interface is exposed with a `Route`. To get the
+The OpenShift GitOps web UI is exposed with a `Route`. To get the
 exact URL of the `Route` follow these steps:
 
 1. Login as cluster administrator on the UI of the hub cluster
@@ -249,12 +250,15 @@ Follow these steps to make the managed clusters available to GitOps:
       file [gitopscluster.yaml](https://github.com/0xFelix/gitops-demo/blob/main/acm-gitops-integration/gitopscluster.yaml)
     - Run `oc create -f acm-gitops-integration/gitopscluster.yaml`
 
-# TODO picture of managed clusters in ArgoCD
 
-In this screenshot you can see, that we successfully made our managed
-clusters available to ArgoCD.
+![](https://i.imgur.com/YRgvFCu.png)
+
+In this screenshot you can see, that the managed
+clusters were made available to ArgoCD successfully. This view can be opened by going to ArgoCD's settings and opening the `Clusters` menu.
 
 ## Deploying OpenShift Virtualization to one or more managed clusters
+
+![](https://i.imgur.com/bSBQwlW.png)
 
 To deploy OpenShift Virtualization to the managed clusters with the help of
 an `ApplicationSet` run the following command:
@@ -280,10 +284,12 @@ Because the `HyperConverged` CRD is unknown to ArgoCD, the sync option
 `SkipDryRunOnMissingResource=true` is set to allow ArgoCD to create a CR
 without knowing its CRD.
 
+In ArgoCD's UI you can follow the synchronization status of the newly created `Application` for each cluster. Eventually every `Application` will reach the healthy and synced status like in the following screenshot.
+
+![](https://i.imgur.com/XMVaIgA.png)
+
 To see what is actually deployed have a look into the following directory:
 `applicationsets/virtualization/manifests`.
-
-# TODO picture of deployed CNV in ArgoCD
 
 ## Deploying a VirtualMachine to one or more managed clusters
 
@@ -298,12 +304,20 @@ This will create an `Application` for each managed cluster that deploys
 a simple `VirtualMachine` on each cluster. It uses the Fedora `DataSource`
 available on the cluster by default to boot a Fedora cloud image.
 
+The created `Application(s)` are also visible in ArgoCD's UI:
+
+![](https://i.imgur.com/qFSzDDA.png)
+
+Notice how the health state of the created `Application` is `Suspended`. This is because the  created `VirtualMachine` is still in stopped state.
+
 To see what is actually deployed have a look into the following directory:
 `applicationsets/demo-vm/manifests`.
 
-# TODO picture of stopped VM in ArgoCD
-
 ### How to start or stop a VirtualMachine
+
+First let us have a closer look at the `Application` of the stopped `VirtualMachine`. Notice the `Suspended` health stae.
+
+![](https://i.imgur.com/27T3eCU.png)
 
 To start or stop a `VirtualMachine` you need to edit the `spec.running`
 field of a `VirtualMachine` and set it to the corresponding value (`false`
@@ -323,7 +337,13 @@ to your repository. In the ArgoCD UI select the `Application` of the
 Otherwise, it will take some time until ArgoCD scans the repository and
 picks up the change.
 
-# TODO picture of running VM in ArgoCD
+After ArgoCD picked up the change it will sync it to the `VirtualMachine` as visible by the `Progressing` health state in the following screenshot:
+
+![](https://i.imgur.com/ABnivtn.png)
+
+Eventually the `VirtualMachine` will be running and healthy:
+
+![](https://i.imgur.com/or5HMD1.png)
 
 ## Advanced usage of ACM Placements with OpenShift GitOps
 
