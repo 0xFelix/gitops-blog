@@ -38,7 +38,8 @@ running any actual workloads, these run on managed clusters. Managed
 clusters are kept in the inventory of the hub cluster. They can be created
 and added to the inventory directly through ACM. Alternatively, existing
 clusters can be added to the inventory as well. For more information have
-a look at the [ACM documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.7/html/about/welcome-to-red-hat-advanced-cluster-management-for-kubernetes#multicluster-architecture).
+a look at
+the [ACM documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.7/html/about/welcome-to-red-hat-advanced-cluster-management-for-kubernetes#multicluster-architecture).
 
 ## What is the GitOps way and what is OpenShift GitOps?
 
@@ -96,8 +97,10 @@ in this blog post yourself:
 
 A repository with the files used in this blog post can be found at
 https://github.com/0xFelix/gitops-demo. You need to clone this repository
-to somewhere where you are able to make changes to it (i.e. forking it on GitHub).
-Then open a terminal on your machine, check out the repository locally and change
+to somewhere where you are able to make changes to it (i.e. forking it on
+GitHub).
+Then open a terminal on your machine, check out the repository locally and
+change
 your working directory into the cloned repository.
 
 The `ApplicationSets` in the demo repository use the above repository URL as
@@ -174,7 +177,8 @@ available to ArgoCD.
 
 ![Managed cluster list](https://i.imgur.com/81VN8tQ.png)
 
-If done correctly, the cluster list of the created `ManagedClusterSet` in ACM should look like in the screenshot above.
+If done correctly, the cluster list of the created `ManagedClusterSet` in ACM
+should look like in the screenshot above.
 
 ## Installing and configuring OpenShift GitOps
 
@@ -195,7 +199,8 @@ console where possible again.
 6. Wait until OpenShift GitOps is ready (`Operators` -->
    `Installed Operators` --> see status of OpenShift GitOps)
 
-If installed correctly, the list of installed operators on your cluster should look like in the following screenshot:
+If installed correctly, the list of installed operators on your cluster should
+look like in the following screenshot:
 
 ![Installed Operators](https://i.imgur.com/gunWrRz.png)
 
@@ -251,7 +256,9 @@ Follow these steps to make the managed clusters available to GitOps:
 
 ![ArgoCD cluster list](https://i.imgur.com/YRgvFCu.png)
 
-In this screenshot you can see that the managed clusters were made available to ArgoCD successfully. This view can be opened by going to ArgoCD's settings and opening the `Clusters` menu.
+In this screenshot you can see that the managed clusters were made available to
+ArgoCD successfully. This view can be opened by going to ArgoCD's settings and
+opening the `Clusters` menu.
 
 ## Deploying OpenShift Virtualization to one or more managed clusters
 
@@ -281,7 +288,9 @@ Because the `HyperConverged` CRD is unknown to ArgoCD, the sync option
 `SkipDryRunOnMissingResource=true` is set to allow ArgoCD to create a CR
 without knowing its CRD.
 
-In ArgoCD's UI you can follow the synchronization status of the newly created `Application` for each cluster. Eventually every `Application` will reach the healthy and synced status like in the following screenshot.
+In ArgoCD's UI you can follow the synchronization status of the newly
+created `Application` for each cluster. Eventually every `Application` will
+reach the healthy and synced status like in the following screenshot.
 
 ![OpenShift Virtualization Application becoming ready](https://i.imgur.com/XMVaIgA.png)
 
@@ -305,14 +314,16 @@ The created `Application(s)` are also visible in ArgoCD's UI:
 
 ![New demo VM Application in suspended state](https://i.imgur.com/qFSzDDA.png)
 
-Notice how the health state of the created `Application` is `Suspended`. This is because the  created `VirtualMachine` is still in stopped state.
+Notice how the health state of the created `Application` is `Suspended`. This is
+because the created `VirtualMachine` is still in stopped state.
 
 To see what is actually deployed have a look into the following directory:
 `applicationsets/demo-vm/manifests`.
 
 ### How to start or stop a VirtualMachine
 
-First let us have a closer look at the `Application` of the stopped `VirtualMachine`. Notice the `Suspended` health state.
+First let us have a closer look at the `Application` of the
+stopped `VirtualMachine`. Notice the `Suspended` health state.
 
 ![Detail view of suspended demo VM Application](https://i.imgur.com/27T3eCU.png)
 
@@ -334,7 +345,8 @@ to your repository. In the ArgoCD UI select the `Application` of the
 Otherwise, it will take some time until ArgoCD scans the repository and
 picks up the change.
 
-After ArgoCD picked up the change it will sync it to the `VirtualMachine` as visible by the `Progressing` health state in the following screenshot:
+After ArgoCD picked up the change it will sync it to the `VirtualMachine` as
+visible by the `Progressing` health state in the following screenshot:
 
 ![Detail view of progressing demo VM Application](https://i.imgur.com/ABnivtn.png)
 
