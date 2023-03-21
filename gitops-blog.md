@@ -1,6 +1,6 @@
 # Using Red Hat Advanced Cluster Management and OpenShift GitOps to manage OpenShift Virtualization
 
-*Anecdote why it is useful and random picture*
+![Title picture](https://i.imgur.com/dB9Lg78.png)
 
 Whether you want to separate your testing and production environments, improve
 the availability of your applications or bring your OpenShift clusters to the
@@ -27,7 +27,7 @@ control of the whole cluster and application life cycle. It acts as a
 central point for keeping an inventory of all your clusters and
 applications and enables multi-cluster and multi-cloud scenarios, such as
 deploying the same application across clusters in different regions,
-possibly on several cloud providers. It employs a hub and spoke architecture
+possibly on several cloud providers. It uses a hub and spoke architecture
 and allows the targeted distribution of Kubernetes manifests across clusters.
 
 ### What are hub and managed clusters?
@@ -35,10 +35,10 @@ and allows the targeted distribution of Kubernetes manifests across clusters.
 The hub cluster is the cluster on which ACM is running on. It
 acts as an inventory and carries out all management actions. It is not
 running any actual workloads, these run on managed clusters. Managed
-clusters can be created directly through ACM and are added to the hub cluster's
-inventory. Alternatively existing clusters can be added to the inventory as
-well. For more information have a look at
-the [ACM documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.7/html/about/welcome-to-red-hat-advanced-cluster-management-for-kubernetes#multicluster-architecture).
+clusters are kept in the inventory of the hub cluster. They can be created
+and added to the inventory directly through ACM. Alternatively, existing
+clusters can be added to the inventory as well. For more information have
+a look at the [ACM documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.7/html/about/welcome-to-red-hat-advanced-cluster-management-for-kubernetes#multicluster-architecture).
 
 ## What is the GitOps way and what is OpenShift GitOps?
 
@@ -95,16 +95,15 @@ in this blog post yourself:
 ## Repository preparation
 
 A repository with the files used in this blog post can be found at
-https://github.com/0xFelix/gitops-demo.
-Please clone this repository somewhere where you are able to make
-changes to it (i.e. forking it on GitHub). Then open a terminal on
-your machine, check out the repository locally and change your working directory
-into the cloned repository.
+https://github.com/0xFelix/gitops-demo. You need to clone this repository
+to somewhere where you are able to make changes to it (i.e. forking it on GitHub).
+Then open a terminal on your machine, check out the repository locally and change
+your working directory into the cloned repository.
 
 The `ApplicationSets` in the demo repository use the above repository URL as
 `repoURL`. To be able to make changes to your `ApplicationSets`, you
 need to adjust the `repoURL` to the URL of your own repository. If you do
-this later don't forget to update any existing `ApplicationSets` on your hub
+this later do not forget to update any existing `ApplicationSets` on your hub
 cluster.
 
 ## Installing and configuring Advanced Cluster Management
@@ -114,7 +113,7 @@ your hub cluster. We will use the OpenShift console where possible.
 
 ### Installing ACM on the hub cluster
 
-![](https://i.imgur.com/FB8niIZ.png)
+![ACM Install in OperatorHub](https://i.imgur.com/FB8niIZ.png)
 
 1. Login as cluster administrator on the UI of the hub cluster
 2. Open the `Administrator` view if it is not already selected
@@ -170,10 +169,10 @@ To add managed clusters to a new set follow these steps:
 5. Click on `Managed resource assignments`
 6. Select all clusters you want to add, click on `Review` and then on `Save`
 
-Now we have a `ManagedClusterSet`, that can be used to make the managed clusters
+Now we have a `ManagedClusterSet` that can be used to make the managed clusters
 available to ArgoCD.
 
-![](https://i.imgur.com/81VN8tQ.png)
+![Managed cluster list](https://i.imgur.com/81VN8tQ.png)
 
 If done correctly, the cluster list of the created `ManagedClusterSet` in ACM should look like in the screenshot above.
 
@@ -185,7 +184,7 @@ console where possible again.
 
 ### Installing OpenShift GitOps on the hub cluster
 
-![](https://i.imgur.com/yMawpQG.png)
+![GitOps Install in OperatorHub](https://i.imgur.com/yMawpQG.png)
 
 1. Login as cluster administrator on the UI of the hub cluster
 2. Open the `Administrator` view if it is not already selected
@@ -196,9 +195,9 @@ console where possible again.
 6. Wait until OpenShift GitOps is ready (`Operators` -->
    `Installed Operators` --> see status of OpenShift GitOps)
 
-If installed correctly, the list of installed operators on your cluster shoud look like in the following screenshot:
+If installed correctly, the list of installed operators on your cluster should look like in the following screenshot:
 
-![](https://i.imgur.com/gunWrRz.png)
+![Installed Operators](https://i.imgur.com/gunWrRz.png)
 
 ### Accessing the OpenShift GitOps web UI
 
@@ -250,15 +249,13 @@ Follow these steps to make the managed clusters available to GitOps:
       file [gitopscluster.yaml](https://github.com/0xFelix/gitops-demo/blob/main/acm-gitops-integration/gitopscluster.yaml)
     - Run `oc create -f acm-gitops-integration/gitopscluster.yaml`
 
+![ArgoCD cluster list](https://i.imgur.com/YRgvFCu.png)
 
-![](https://i.imgur.com/YRgvFCu.png)
-
-In this screenshot you can see, that the managed
-clusters were made available to ArgoCD successfully. This view can be opened by going to ArgoCD's settings and opening the `Clusters` menu.
+In this screenshot you can see that the managed clusters were made available to ArgoCD successfully. This view can be opened by going to ArgoCD's settings and opening the `Clusters` menu.
 
 ## Deploying OpenShift Virtualization to one or more managed clusters
 
-![](https://i.imgur.com/bSBQwlW.png)
+![OpenShift Virtualization Application in ArgoCD](https://i.imgur.com/bSBQwlW.png)
 
 To deploy OpenShift Virtualization to the managed clusters with the help of
 an `ApplicationSet` run the following command:
@@ -286,7 +283,7 @@ without knowing its CRD.
 
 In ArgoCD's UI you can follow the synchronization status of the newly created `Application` for each cluster. Eventually every `Application` will reach the healthy and synced status like in the following screenshot.
 
-![](https://i.imgur.com/XMVaIgA.png)
+![OpenShift Virtualization Application becoming ready](https://i.imgur.com/XMVaIgA.png)
 
 To see what is actually deployed have a look into the following directory:
 `applicationsets/virtualization/manifests`.
@@ -306,7 +303,7 @@ available on the cluster by default to boot a Fedora cloud image.
 
 The created `Application(s)` are also visible in ArgoCD's UI:
 
-![](https://i.imgur.com/qFSzDDA.png)
+![New demo VM Application in suspended state](https://i.imgur.com/qFSzDDA.png)
 
 Notice how the health state of the created `Application` is `Suspended`. This is because the  created `VirtualMachine` is still in stopped state.
 
@@ -315,9 +312,9 @@ To see what is actually deployed have a look into the following directory:
 
 ### How to start or stop a VirtualMachine
 
-First let us have a closer look at the `Application` of the stopped `VirtualMachine`. Notice the `Suspended` health stae.
+First let us have a closer look at the `Application` of the stopped `VirtualMachine`. Notice the `Suspended` health state.
 
-![](https://i.imgur.com/27T3eCU.png)
+![Detail view of suspended demo VM Application](https://i.imgur.com/27T3eCU.png)
 
 To start or stop a `VirtualMachine` you need to edit the `spec.running`
 field of a `VirtualMachine` and set it to the corresponding value (`false`
@@ -339,11 +336,11 @@ picks up the change.
 
 After ArgoCD picked up the change it will sync it to the `VirtualMachine` as visible by the `Progressing` health state in the following screenshot:
 
-![](https://i.imgur.com/ABnivtn.png)
+![Detail view of progressing demo VM Application](https://i.imgur.com/ABnivtn.png)
 
 Eventually the `VirtualMachine` will be running and healthy:
 
-![](https://i.imgur.com/or5HMD1.png)
+![Detail view of healthy demo VM Application](https://i.imgur.com/or5HMD1.png)
 
 ## Advanced usage of ACM Placements with OpenShift GitOps
 
