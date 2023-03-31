@@ -4,9 +4,9 @@
 
 Whether you want to separate your testing and production environments, improve
 the availability of your applications or bring your OpenShift clusters to the
-edge, working with a multi-cluster environment is the key in achieving
-those goals. Red Hat Advanced Cluster Management allows you to easily work
-with multiple clusters and comes with a number of advantages.
+edge, working with a multi-cluster environment is the key in achieving those
+goals. Red Hat Advanced Cluster Management allows you to easily work with
+multiple clusters and comes with a number of advantages.
 
 However, managing your clusters and applications at scale can be a challenging
 task. Ideally there is a single source of truth, which determines the
@@ -24,21 +24,21 @@ Cluster Management and OpenShift GitOps.
 Red Hat Advanced Cluster Management or short ACM simplifies the management
 of multiple clusters by offering end-to-end management, visibility and
 control of the whole cluster and application life cycle. It acts as a
-central point for keeping an inventory of all your clusters and
-applications and enables multi-cluster and multi-cloud scenarios, such as
-deploying the same application across clusters in different regions,
-possibly on several cloud providers. It uses a hub and spoke architecture
-and allows the targeted distribution of Kubernetes manifests across clusters.
+central point for keeping an inventory of all your clusters and applications
+and enables multi-cluster and multi-cloud scenarios, such as deploying the
+same application across clusters in different regions, possibly on several
+cloud providers. It uses a hub and spoke architecture and allows the
+targeted distribution of Kubernetes manifests across clusters.
 
 ### What are hub and managed clusters?
 
 The hub cluster is the cluster on which ACM is running on. It
 acts as an inventory and carries out all management actions. It is usually not
-running any actual workloads (though still possible), these run on managed clusters.
-Managed clusters are kept in the inventory of the hub cluster. They can be created
-and added to the inventory directly through ACM. Alternatively, existing
-clusters can be added to the inventory as well. For more information have
-a look at
+running any actual workloads (though still possible), these run on managed
+clusters. Managed clusters are kept in the inventory of the hub cluster.
+They can be created and added to the inventory directly through ACM.
+Alternatively, existing clusters can be added to the inventory as well. For
+more information have a look at
 the [ACM documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.7/html/about/welcome-to-red-hat-advanced-cluster-management-for-kubernetes#multicluster-architecture).
 
 ## What is the GitOps way and what is OpenShift GitOps?
@@ -50,7 +50,7 @@ repository are automatically applied to one or more clusters while changes
 to a cluster will be automatically reverted to the state described in the
 single source of truth.
 
-Red Hat Openshift GitOps enables declarative GitOps workflows and allows to
+Red Hat OpenShift GitOps enables declarative GitOps workflows and allows to
 deploy applications on-demand. It monitors the live state of clusters
 against the desired state in a Git repository and keeps them in sync. It
 builds on the ArgoCD project, therefore the terms OpenShift GitOps and ArgoCD
@@ -74,8 +74,8 @@ it is possible to dynamically select a subset of clusters available to
 ArgoCD to deploy resources to.
 
 In this blog post we are going to use `ApplicationSets` to deploy OpenShift
-Virtualization and `VirtualMachines` to multiple clusters while using
-the same declaration of resources for all clusters.
+Virtualization and `VirtualMachines` to multiple clusters while using the
+same declaration of resources for all clusters.
 
 For more information on `ApplicationSets` see the
 [documentation](https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset).
@@ -87,7 +87,8 @@ in this blog post yourself:
 
 - A Git repository accessible by the hub cluster
 - One OpenShift cluster acting as hub cluster
-    - Needs to be publicly accessible or at least accessible by the managed clusters
+    - Needs to be publicly accessible or at least accessible by the managed
+      clusters
 - One or more OpenShift clusters acting as managed clusters
     - Can be in private networks
     - Virtualization has to be available
@@ -98,16 +99,13 @@ in this blog post yourself:
 A repository with the files used in this blog post can be found at
 https://github.com/0xFelix/gitops-demo. You need to clone this repository
 to somewhere where you are able to make changes to it (i.e. forking it on
-GitHub).
-Then open a terminal on your machine, check out the repository locally and
-change
-your working directory into the cloned repository.
+GitHub). Then open a terminal on your machine, check out the repository
+locally and change your working directory into the cloned repository.
 
 The `ApplicationSets` in the demo repository use the above repository URL as
-`repoURL`. To be able to make changes to your `ApplicationSets`, you
-need to adjust the `repoURL` to the URL of your own repository. If you do
-this later do not forget to update any existing `ApplicationSets` on your hub
-cluster.
+`repoURL`. To be able to make changes to your `ApplicationSets`, you need to
+adjust the `repoURL` to the URL of your own repository. If you do this later
+do not forget to update any existing `ApplicationSets` on your hub cluster.
 
 ## Installing and configuring Advanced Cluster Management
 
@@ -135,8 +133,8 @@ Managed clusters can be added to ACM in two ways:
 1. Create a new cluster with ACM
 2. Add an existing cluster to ACM
 
-> Note: For the sake of simplicity we will let ACM create the managed
-> clusters in this blog post on a public cloud provider. Please note that nested
+> Note: For the sake of simplicity we will let ACM create the managed clusters
+> in this blog post on a public cloud provider. Please note that nested
 > virtualization is not supported in production deployments.
 
 To create one or more managed clusters follow these steps:
@@ -151,7 +149,7 @@ To create one or more managed clusters follow these steps:
    wizard (use the default cluster set for now)
 
 > Note: When using Azure as cloud provider select instance type
-`Standard_D8s_v3` for the control plane and `Standard_D4s_v3` for the worker
+> `Standard_D8s_v3` for the control plane and `Standard_D4s_v3` for the worker
 > nodes, resources might become to tight to run virtual machines on the
 > cluster otherwise.
 
@@ -268,21 +266,21 @@ label on them. Ideally it would be possible to assign them from ACM, but for the
 time being this still has to be done in ArgoCD. In an upcoming ACM release it
 will be possible to carry over labels set in ACM to ArgoCD.
 
-In this post we will work with the `dev` and the `prod` environments. Add your managed
-clusters to the environments by following these steps:
+In this post we will work with the `dev` and the `prod` environments. Add your
+managed clusters to the environments by following these steps:
 
-Open ArgoCD's settings and open the `Clusters` menu. Then click on the three dots on
-the right side of a cluster to edit it. 
+Open ArgoCD's settings and open the `Clusters` menu. Then click on the three
+dots on the right side of a cluster to edit it.
 
 ![ArgoCD cluster list](https://i.imgur.com/dNywPwq.png)
 
-One or more of the clusters should belong to the `dev` environment. This is achieved by
-setting the `env` label to the value `dev` on the managed cluster.
+One or more of the clusters should belong to the `dev` environment. This is
+achieved by setting the `env` label to the value `dev` on the managed cluster.
 
 ![ArgoCD cluster list](https://i.imgur.com/0HWVYhO.png)
 
-One or more of the clusters should belong to the `prod` environment. This is achieved by
-setting the `env` label to the value `prod` on the managed cluster.
+One or more of the clusters should belong to the `prod` environment. This is
+achieved by setting the `env` label to the value `prod` on the managed cluster.
 
 After editing the cluster do not forget to save your changes.
 
@@ -332,8 +330,8 @@ an `ApplicationSet` run the following command:
 oc create -f applicationsets/demo-vm/applicationset-demo-vm.yaml
 ```
 
-This will create an `Application` for each managed cluster that deploys
-a simple `VirtualMachine` on each cluster. It uses the Fedora `DataSource`
+This will create an `Application` for each managed cluster that deploys a
+simple `VirtualMachine` on each cluster. It uses the Fedora `DataSource`
 available on the cluster by default to boot a Fedora cloud image.
 
 The created `Applications` are visible in ArgoCD's UI:
@@ -343,24 +341,26 @@ The created `Applications` are visible in ArgoCD's UI:
 Notice how the health state of the created `Application` is `Suspended`. This is
 because the created `VirtualMachine` is still in stopped state.
 
-Instead of plain manifests the `Application` is using `Kustomize` this time. This allows 
-to apply customizations to the `Applications` depending on the environment managed
-cluster belong to. It is achieved by using the `metadata.labels.env` value to choose
-the right `Kustomize` overlay.
+Instead of plain manifests the `Application` is using `Kustomize` this time.
+This allows to apply customizations to the `Applications` depending on the
+environment managed cluster belong to. It is achieved by using the `metadata.
+labels.env` value to choose the right `Kustomize` overlay.
 
-The `dev` overlay prefixes names of created resources with `dev-`, while the `prod` overlay
-prefixes names with `prod-`. Furthermore the created `VirtualMachines` get more or less memory
-assigned depending on the environment. These are only simple customizations, but the possibilities are endless!
+The `dev` overlay prefixes names of created resources with `dev-`, while
+the `prod` overlay prefixes names with `prod-`. Furthermore, the created
+`VirtualMachines` get more or less memory assigned depending on the
+environment. These are only simple customizations, but the possibilities are
+endless!
 
 To see what is actually deployed have a look into the following directory:
 `applicationsets/demo-vm/kustomize`.
 
 ### How to start or stop a VirtualMachine
 
-First let us have a closer look at the `Application` of the
-stopped `VirtualMachine`. Notice the `Suspended` health state.
-Also notice the `dev-` prefix of the created `VirtualMachine`.
-It was created on a cluster belonging to the `dev` environment.
+First let us have a closer look at the `Application` of the stopped
+`VirtualMachine`. Notice the `Suspended` health state. Also notice the
+`dev-` prefix of the created `VirtualMachine`. It was created on a cluster
+belonging to the `dev` environment.
 
 ![Detail view of suspended demo VM Application](https://i.imgur.com/TpYD07I.png)
 
@@ -368,19 +368,18 @@ To start or stop a `VirtualMachine` you need to edit the `spec.running`
 field of a `VirtualMachine` and set it to the corresponding value (`false`
 or `true`).
 
-If the `VirtualMachine` has an appropriate termination grace
-period (`spec.template.spec.terminationGracePeriodSeconds`), setting this
-value to `false` will gracefully shut down the `VirtualMachine`. When
-setting the timeout grace period to 0 seconds, the `VirtualMachine` is
-stopped immediately however.
+If the `VirtualMachine` has an appropriate termination grace period
+(`spec.template.spec.terminationGracePeriodSeconds`), setting this value to
+`false` will gracefully shut down the `VirtualMachine`. When setting the
+timeout grace period to 0 seconds, the `VirtualMachine` is stopped
+immediately however.
 
 To apply new changes with ArgoCD you need to commit and push changes to
 the Git repository containing your `Application`. To start or stop a
-`VirtualMachine` update the manifest and commit and push
-to your repository. In the ArgoCD UI select the `Application` of the
-`VirtualMachine` and click `Refresh` to apply the change immediately.
-Otherwise, it will take some time until ArgoCD scans the repository and
-picks up the change.
+`VirtualMachine` update the manifest and commit and push to your repository.
+In the ArgoCD UI select the `Application` of the `VirtualMachine` and click
+`Refresh` to apply the change immediately. Otherwise, it will take some time
+until ArgoCD scans the repository and picks up the change.
 
 In this case the `Kustomize` base was modified, so the `VirtualMachine` in every
 environment is started, but this modification could have also been applied to
@@ -400,10 +399,10 @@ Eventually the `VirtualMachine` will be running and healthy:
 For the sake of simplicity the `Placement` created in this blog post selects the
 whole `ManagedClusterSet`, but more advanced use cases are possible.
 
-ACM can dynamically select a subset of clusters from the
-`ManagedClusterSet`, while following a defined set of criteria. This for
-example allows to schedule `VirtualMachines` on clusters with the most
-resources available at the time of the placement decision.
+ACM can dynamically select a subset of clusters from the `ManagedClusterSet`,
+while following a defined set of criteria. This for example allows to
+schedule `VirtualMachines` on clusters with the most resources available at
+the time of the placement decision.
 
 For more on this topic see
 [Using the Open Cluster Management Placement for Multicluster Scheduling](https://cloud.redhat.com/blog/using-the-open-cluster-management-placement-for-multicluster-scheduling).
@@ -415,14 +414,12 @@ For more on this topic see
 In this blog post we set up a hub cluster and two clusters managed
 by ACM to deploy applications to from a centralized management point. As
 example applications we deployed OpenShift Virtualization with simple manifests
-and a virtual machine with manifests customized by `Kustomize`.
-We learned how to apply customizations to specific environments and how we
-can start and stop virtual machines in a declarative way. All of this was
-accomplished in the GitOps way by using a Git repository as a single source
-of truth.
+and a virtual machine with manifests customized by `Kustomize`. We learned
+how to apply customizations to specific environments and how we can start
+and stop virtual machines in a declarative way. All of this was accomplished
+in the GitOps way by using a Git repository as a single source of truth.
 
-This is of course only the tip of the iceberg, building on this setup
-allows you customize your `ApplicationSets` for different environments
-like development, staging and production or to schedule your applications
-based on custom criteria (e.g. available resources) with advanced placements
-rules.
+This is of course only the tip of the iceberg, building on this setup allows
+you to customize your `ApplicationSets` for different environments like
+development, staging and production or to schedule your applications based
+on custom criteria (e.g. available resources) with advanced placements rules.
