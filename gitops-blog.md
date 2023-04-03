@@ -5,8 +5,8 @@
 Whether you want to separate your testing and production environments, improve
 the availability of your applications or bring your OpenShift clusters to the
 edge, working with a multi-cluster environment is the key in achieving those
-goals. Red Hat Advanced Cluster Management allows you to easily work with
-multiple clusters and comes with a number of advantages.
+goals. Red Hat Advanced Cluster Management or short ACM allows you to easily
+work with multiple clusters and comes with a number of advantages.
 
 However, managing your clusters and applications at scale can be a challenging
 task. Ideally there is a single source of truth, which determines the
@@ -21,12 +21,12 @@ Cluster Management and OpenShift GitOps.
 
 ## What is Red Hat Advanced Cluster Management?
 
-Red Hat Advanced Cluster Management or short ACM simplifies the management
-of multiple clusters by offering end-to-end management, visibility and
-control of the whole cluster and application life cycle. It acts as a
-central point for keeping an inventory of all your clusters and applications
-and enables multi-cluster and multi-cloud scenarios, such as deploying the
-same application across clusters in different regions, possibly on several
+Red Hat Advanced Cluster Management simplifies the management of multiple
+clusters by offering end-to-end management, visibility and control of the
+whole cluster and application life cycle. It acts as a central point for
+keeping an inventory of all your clusters and applications and enables
+multi-cluster and multi-cloud scenarios, such as deploying the same
+application across clusters in different regions, possibly on several
 cloud providers. It uses a hub and spoke architecture and allows the
 targeted distribution of Kubernetes manifests across clusters.
 
