@@ -8,7 +8,6 @@ edge, working with a multi-cluster environment is the key in achieving those
 goals. Red Hat Advanced Cluster Management allows you to easily work with
 multiple clusters and comes with a number of advantages.
 
-
 However, managing your clusters and applications at scale can be a challenging
 task. Ideally there is a single source of truth, which determines the
 configuration and workloads of each cluster. OpenShift GitOps enables you to do
@@ -271,19 +270,22 @@ In this post we will work with the `dev` and the `prod` environments. Add your
 managed clusters to the environments by following these steps:
 
 Open ArgoCD's settings and open the `Clusters` menu. Then click on the three
-dots on the right side of a cluster to edit it.
+dots on the right side of a cluster to edit it. After editing the cluster do not
+forget to save your changes.
+
+#### Assigning clusters to the dev environment
 
 ![ArgoCD cluster list](https://i.imgur.com/dNywPwq.png)
 
 One or more of the clusters should belong to the `dev` environment. This is
 achieved by setting the `env` label to the value `dev` on the managed cluster.
 
+#### Assigning clusters to the prod environment
+
 ![ArgoCD cluster list](https://i.imgur.com/0HWVYhO.png)
 
 One or more of the clusters should belong to the `prod` environment. This is
 achieved by setting the `env` label to the value `prod` on the managed cluster.
-
-After editing the cluster do not forget to save your changes.
 
 ## Deploying OpenShift Virtualization to the managed clusters
 
@@ -304,7 +306,7 @@ apply any changes to this repository or undo changes which are not in this
 repository. Sync waves are used to ensure that resources are created in the
 right order.
 
-Order of resource creation:
+### Order of resource creation
 
 1. `OperatorGroup`
 2. `Subscription`
@@ -313,6 +315,8 @@ Order of resource creation:
 Because the `HyperConverged` CRD is unknown to ArgoCD, the sync option
 `SkipDryRunOnMissingResource=true` is set to allow ArgoCD to create a CR
 without knowing its CRD.
+
+### Health state of an Application
 
 In ArgoCD's UI you can follow the synchronization status of the newly
 created `Application` for each cluster. Eventually every `Application` will
@@ -337,17 +341,19 @@ This will create an `Application` for each managed cluster that deploys a
 simple `VirtualMachine` on each cluster. It uses the Fedora `DataSource`
 available on the cluster by default to boot a Fedora cloud image.
 
-The created `Applications` are visible in ArgoCD's UI:
-
-![New demo VM Applications in suspended state](https://i.imgur.com/Jz82QR1.png)
+### Health state of the `Application`
 
 Notice how the health state of the created `Application` is `Suspended`. This is
 because the created `VirtualMachine` is still in stopped state.
 
-Instead of plain manifests the `Application` is using `Kustomize` this time.
-This allows to apply customizations to the `Applications` depending on the
-environment managed cluster belong to. It is achieved by using the `metadata.
-labels.env` value to choose the right `Kustomize` overlay.
+![New demo VM Applications in suspended state](https://i.imgur.com/Jz82QR1.png)
+
+### Applying customizations to environments
+
+Instead of using plain manifests this `ApplicationSet` is using `Kustomize`.
+This allows to apply customizations to an `Application` depending on the
+environment a managed cluster belongs to. In this post it is achieved by using
+the `metadata.labels.env` value to choose the right `Kustomize` overlay.
 
 The `dev` overlay prefixes names of created resources with `dev-`, while
 the `prod` overlay prefixes names with `prod-`. Furthermore, the created
@@ -357,6 +363,20 @@ endless!
 
 To see what is actually deployed have a look into the following directory:
 `applicationsets/demo-vm/kustomize`.
+
+### Quick summary
+
+Here is a quick summary of the required steps:
+
+1. Choose to modify all environments (`base`) or a single environment (eg.
+   `dev` or `prod`)
+2. To start the `VirtualMachine` in all environments edit
+   `applicationsets/demo-vm/kustomize/base/virtualmachine.yaml`
+3. Set `spec.running` to `true`
+4. Commit and push the change to your repository
+5. Refresh ArgoCD to pick up the change
+
+The following sections will explain the steps in more detail.
 
 ### How to start or stop a VirtualMachine
 
@@ -369,13 +389,26 @@ belonging to the `dev` environment.
 
 To start or stop a `VirtualMachine` you need to edit the `spec.running`
 field of a `VirtualMachine` and set it to the corresponding value (`false`
-or `true`).
+or `true`). You can do this in the `applicationsets/demo-vm/kustomize`
+directory.
+
+### Graceful shutdown of `VirtualMachines`
 
 If the `VirtualMachine` has an appropriate termination grace period
 (`spec.template.spec.terminationGracePeriodSeconds`), by setting this value to
 `false` the `VirtualMachine` will be gracefully shut down. When setting the
 timeout grace period to 0 seconds, the `VirtualMachine` is stopped
 immediately however.
+
+### Applying changes to specific environments
+
+When modifying the `VirtualMachine` you can choose to either modify the base or
+a specific overlay of `Kustomize`. This allows to start or stop the
+`VirtualMachine` in every environment or just in a specific one. In this
+example the `VirtualMachine` was started in every environment by modifying
+the `Kustomize` base.
+
+### Applying the change with ArgoCD
 
 To apply new changes with ArgoCD you need to commit and push changes to
 the Git repository containing your `Application`. To start or stop a
@@ -384,14 +417,7 @@ repository. In the ArgoCD UI select the `Application` of the `VirtualMachine`
 and click `Refresh` to apply the change immediately. Otherwise, it will take
 some time until ArgoCD scans the repository and picks up the change.
 
-When modifying the `VirtualMachine` you can choose to either modify the base or
-a specific overlay with `Kustomize`. This allows to start or stop the `VirtualMachine`
-in every environment or just in a specific one. In the example displayed in this section
-the `VirtualMachine` was started in every environment by modifying the `Kustomize` base.
-
-In this the `Kustomize` base was modified, so the `VirtualMachine` in every
-environment is started, but this modification could have also been applied to
-just a specific `Kustomize` overlay for one environment.
+### Observing the change
 
 After ArgoCD picked up the change it will sync it to the `VirtualMachine` as
 visible by the `Progressing` health state in the following screenshot:
