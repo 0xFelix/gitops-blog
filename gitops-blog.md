@@ -8,6 +8,7 @@ edge, working with a multi-cluster environment is the key in achieving those
 goals. Red Hat Advanced Cluster Management allows you to easily work with
 multiple clusters and comes with a number of advantages.
 
+
 However, managing your clusters and applications at scale can be a challenging
 task. Ideally there is a single source of truth, which determines the
 configuration and workloads of each cluster. OpenShift GitOps enables you to do
@@ -45,8 +46,8 @@ the [ACM documentation](https://access.redhat.com/documentation/en-us/red_hat_ad
 
 The GitOps way uses Git repositories as a single source of truth to deliver
 infrastructure as code. Automation is employed to keep the desired and the
-live state of clusters in sync at all times. This means any changes to a
-repository are automatically applied to one or more clusters while changes
+live state of clusters in sync at all times. This means any change to a
+repository is automatically applied to one or more clusters while changes
 to a cluster will be automatically reverted to the state described in the
 single source of truth.
 
@@ -289,7 +290,8 @@ After editing the cluster do not forget to save your changes.
 ![OpenShift Virtualization Application in ArgoCD](https://i.imgur.com/uioIT1s.png)
 
 To deploy OpenShift Virtualization to the managed clusters with the help of
-an `ApplicationSet` run the following command:
+an `ApplicationSet` run the following command from your cloned repository
+(See [Repository preparation](#Repository-preparation)):
 
 ```shell
 oc create -f applicationsets/virtualization/applicationset-virtualization.yaml
@@ -324,7 +326,8 @@ To see what is actually deployed have a look into the following directory:
 ## Deploying a VirtualMachine to the managed clusters
 
 To deploy a Fedora `VirtualMachine` on all managed clusters with the help of
-an `ApplicationSet` run the following command:
+an `ApplicationSet` run the following command from your cloned repository
+(See [Repository preparation](#Repository-preparation)):
 
 ```shell
 oc create -f applicationsets/demo-vm/applicationset-demo-vm.yaml
@@ -369,19 +372,24 @@ field of a `VirtualMachine` and set it to the corresponding value (`false`
 or `true`).
 
 If the `VirtualMachine` has an appropriate termination grace period
-(`spec.template.spec.terminationGracePeriodSeconds`), setting this value to
-`false` will gracefully shut down the `VirtualMachine`. When setting the
+(`spec.template.spec.terminationGracePeriodSeconds`), by setting this value to
+`false` the `VirtualMachine` will be gracefully shut down. When setting the
 timeout grace period to 0 seconds, the `VirtualMachine` is stopped
 immediately however.
 
 To apply new changes with ArgoCD you need to commit and push changes to
 the Git repository containing your `Application`. To start or stop a
-`VirtualMachine` update the manifest and commit and push to your repository.
-In the ArgoCD UI select the `Application` of the `VirtualMachine` and click
-`Refresh` to apply the change immediately. Otherwise, it will take some time
-until ArgoCD scans the repository and picks up the change.
+`VirtualMachine` you have to update the manifest and commit and push to your
+repository. In the ArgoCD UI select the `Application` of the `VirtualMachine`
+and click `Refresh` to apply the change immediately. Otherwise, it will take
+some time until ArgoCD scans the repository and picks up the change.
 
-In this case the `Kustomize` base was modified, so the `VirtualMachine` in every
+When modifying the `VirtualMachine` you can choose to either modify the base or
+a specific overlay with `Kustomize`. This allows to start or stop the `VirtualMachine`
+in every environment or just in a specific one. In the example displayed in this section
+the `VirtualMachine` was started in every environment by modifying the `Kustomize` base.
+
+In this the `Kustomize` base was modified, so the `VirtualMachine` in every
 environment is started, but this modification could have also been applied to
 just a specific `Kustomize` overlay for one environment.
 
